@@ -1,0 +1,1 @@
+douyin-tiktok-scraper>=1.2.9
