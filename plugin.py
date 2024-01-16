@@ -37,9 +37,20 @@ class App(Plugin):
     def will_send_reply(self, event: Event):
         pass
 
+    async def hybrid_parsing(self, url):
+        result = {}
+        for n in range(2):
+            try:
+                return await self.api.hybrid_parsing(url) or {}
+            except Exception as exc:
+                logger.error('Scraper Exception: %s', exc)
+                result = {'message': f'{exc}'}
+                await asyncio.sleep(0.1)
+        return result
+
     def reply(self, event: Event) -> Reply:
         query = event.context.query
-        result = asyncio.run(self.api.hybrid_parsing(query)) or {}
+        result = asyncio.run(self.hybrid_parsing(query)) or {}
         logger.info('Scraper: %s', [query, result])
         vdata = result.get('video_data') or {}
         url = vdata.get('nwm_video_url_HQ') or vdata.get('nwm_video_url')
