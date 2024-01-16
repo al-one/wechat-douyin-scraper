@@ -1,6 +1,6 @@
 import asyncio
 from plugins import register, Plugin, Event, logger, Reply, ReplyType
-from douyin_tiktok_scraper.scraper import Scraper
+from .scraper import Scraper
 
 @register
 class App(Plugin):
@@ -51,11 +51,11 @@ class App(Plugin):
     def reply(self, event: Event) -> Reply:
         query = event.context.query
         result = asyncio.run(self.hybrid_parsing(query)) or {}
-        logger.info('Scraper: %s', [query, result])
-        vdata = result.get('video_data') or {}
-        url = vdata.get('nwm_video_url_HQ') or vdata.get('nwm_video_url')
+        vdata = result.get('video_data') or result
+        url = vdata.get('nwm_video_url_HQ') or vdata.get('nwm_video_url') or vdata.get('video_url')
+        logger.info('Scraper result: %s', url or result)
         if url:
             return Reply(ReplyType.VIDEO, url)
         if msg := result.get('message'):
-            return Reply(ReplyType.TEXT, msg)
+            return Reply(ReplyType.TEXT, f'Scraper: {msg}')
         return Reply(ReplyType.TEXT, f'{result}' or '获取失败')
