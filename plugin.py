@@ -52,9 +52,16 @@ class App(Plugin):
         query = event.context.query
         result = asyncio.run(self.hybrid_parsing(query)) or {}
         vdata = result.get('video_data') or result
-        url = vdata.get('nwm_video_url_HQ') or vdata.get('nwm_video_url') or vdata.get('video_url')
+        url = vdata.get('nwm_video_url') or vdata.get('video_url')
         logger.info('Scraper result: %s', url or result)
         if url:
+            only_link = self.config.get('only_link')
+            if self.config.get('with_link') or only_link:
+                link = vdata.get('nwm_video_url_HQ') or url
+                reply = Reply(ReplyType.TEXT, link)
+                if only_link:
+                    return reply
+                event.channel.send(reply, event.message)
             return Reply(ReplyType.VIDEO, url)
         if msg := result.get('message'):
             return Reply(ReplyType.TEXT, f'Scraper: {msg}')
