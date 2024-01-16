@@ -20,7 +20,7 @@
     {
       "name": "douyin_scraper",
       "command": ["复制打开抖音", "v.douyin", "tiktok.com", "kuaishou.com"],
-      "with_link": true, # 同时发送链接
+      "with_link": "{desc}\n高清视频链接:\n{link}", # 同时发送链接，string或bool，string时作为回复前缀
       "only_link": true  # 仅发送链接
     }
   ]

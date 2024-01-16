@@ -55,10 +55,16 @@ class App(Plugin):
         url = vdata.get('nwm_video_url') or vdata.get('video_url')
         logger.info('Scraper result: %s', url or result)
         if url:
+            with_link = self.config.get('with_link')
             only_link = self.config.get('only_link')
-            if self.config.get('with_link') or only_link:
+            if with_link or only_link:
                 link = vdata.get('nwm_video_url_HQ') or url
-                reply = Reply(ReplyType.TEXT, link)
+                if with_link not in [True, 1, '1', 'on', 'yes', 'true']:
+                    if '{link}' not in with_link:
+                        with_link = f'{with_link}' + '{link}'
+                    link = with_link.replace('{link}', link)
+                    link = link.replace('{desc}', result.get('desc', ''))
+                reply = Reply(ReplyType.TEXT, link.strip())
                 if only_link:
                     return reply
                 event.channel.send(reply, event.message)
