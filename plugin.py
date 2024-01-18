@@ -1,3 +1,5 @@
+import os
+import time
 import asyncio
 from plugins import register, Plugin, Event, logger, Reply, ReplyType
 from .scraper import Scraper
@@ -5,6 +7,7 @@ from .scraper import Scraper
 @register
 class App(Plugin):
     name = 'douyin_scraper'
+    latest_clear = 0
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -21,7 +24,7 @@ class App(Plugin):
         return cmds
 
     def did_receive_message(self, event: Event):
-        pass
+        self.clear_assets()
 
     def will_generate_reply(self, event: Event):
         query = event.context.query
@@ -72,3 +75,26 @@ class App(Plugin):
         if msg := result.get('message'):
             return Reply(ReplyType.TEXT, f'Scraper: {msg}')
         return Reply(ReplyType.TEXT, f'{result}' or '获取失败')
+
+    def clear_assets(self):
+        now = time.time()
+        if now - self.latest_clear < 300:
+            return
+        days = self.config.get('keep_assets_days', 0)
+        if not days:
+            return
+        try:
+            current_dir = os.path.dirname(os.path.realpath(__file__))
+            assets_dir = os.path.dirname(f'{current_dir}/../../assets/.')
+            files = os.listdir(assets_dir)
+            for file in files:
+                path = os.path.join(assets_dir, file)
+                if '.gitkeep' in path:
+                    continue
+                tim = os.path.getmtime(path)
+                if time and now - tim > days * 86400:
+                    os.remove(path)
+                    logger.info('Clear assets file: %s', path)
+            self.latest_clear = now
+        except Exception as exc:
+            logger.warning('Clear assets failed: %s', exc)
