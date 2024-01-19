@@ -23,14 +23,22 @@ class App(Plugin):
             cmds = [cmds]
         return cmds
 
+    def config_for(self, event: Event, key, default=None):
+        val = self.config.get(key, {})
+        if isinstance(val, dict):
+            msg = event.message
+            dfl = val.get('*', default)
+            val = val.get(msg.room_id or msg.sender_id, dfl)
+        return val
+
     def did_receive_message(self, event: Event):
-        if self.config.get('without_at'):
+        if self.config_for(event, 'without_at'):
             self.reply(event)
 
         self.clear_assets()
 
     def will_generate_reply(self, event: Event):
-        if not self.config.get('without_at'):
+        if not self.config_for(event, 'without_at'):
             self.reply(event)
 
     def will_decorate_reply(self, event: Event):
@@ -58,8 +66,8 @@ class App(Plugin):
                 return Reply(ReplyType.TEXT, f'Scraper: {msg}')
             return Reply(ReplyType.TEXT, f'{result}' or '获取视频失败')
 
-        with_link = self.config.get('with_link')
-        only_link = self.config.get('only_link')
+        with_link = self.config_for(event, 'with_link')
+        only_link = self.config_for(event, 'only_link')
         if with_link or only_link:
             link = vdata.get('nwm_video_url_HQ') or url
             if with_link not in [True, 1, '1', 'on', 'yes', 'true']:
