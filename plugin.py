@@ -83,7 +83,7 @@ class App(Plugin):
 
     async def hybrid_parsing(self, url):
         result = {}
-        for n in range(2):
+        for n in range(1):
             try:
                 return await self.api.hybrid_parsing(url) or {}
             except Exception as exc:

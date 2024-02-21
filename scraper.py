@@ -42,7 +42,7 @@ class Scraper:
             'accept-encoding': 'gzip, deflate, br',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
             'Referer': 'https://www.douyin.com/',
-            'cookie': ''
+            'Cookie': 'ttwid=1%7C_YWevsPUAiiah-UmkGfVcE6JK44XDRYhmtzl3BJzdrg%7C1708507529%7Cc66ca247a2b20a7f6b5abfb014ce38c4258b1f18ba4009424fdb0b42799e285e'
         }
         self.tiktok_api_headers = {
             'User-Agent': 'com.ss.android.ugc.trill/494+Mozilla/5.0+(Linux;+Android+12;+2112123G+Build/SKQ1.211006.001;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/107.0.5304.105+Mobile+Safari/537.36'
@@ -177,10 +177,9 @@ class Scraper:
                     async with aiohttp.ClientSession() as session:
                         async with session.get(url, headers=self.headers, proxy=self.proxies, allow_redirects=False,
                                                timeout=10) as response:
-                            if response.status == 302:
-                                url = response.headers['Location'].split('?')[0] if '?' in response.headers[
-                                    'Location'] else \
-                                    response.headers['Location']
+                            if response.status in [301, 302]:
+                                loc = response.headers.get('Location', '')
+                                url = loc.split('?')[0] if '?' in loc else loc
                                 print('获取原始链接成功, 原始链接为: {}'.format(url))
                                 return url
                 except Exception as e:
@@ -209,10 +208,9 @@ class Scraper:
                     async with aiohttp.ClientSession() as session:
                         async with session.get(url, headers=self.headers, proxy=self.proxies, allow_redirects=False,
                                                timeout=10) as response:
-                            if response.status == 301:
-                                url = response.headers['Location'].split('?')[0] if '?' in response.headers[
-                                    'Location'] else \
-                                    response.headers['Location']
+                            if response.status in [301, 302]:
+                                loc = response.headers.get('Location', '')
+                                url = loc.split('?')[0] if '?' in loc else loc
                                 print('获取原始链接成功, 原始链接为: {}'.format(url))
                                 return url
                 except Exception as e:
@@ -390,12 +388,14 @@ class Scraper:
                                        timeout=10) as response:
                     response = await response.json()
                     # 获取视频数据/Get video data
-                    video_data = response['item_list'][0]
+                    video_data = response.get('item_list', [None])[0]
                     # print('获取视频数据成功！')
-                    # print("抖音API返回数据: {}".format(video_data))
+                    if not video_data:
+                        print("抖音API返回数据: {}".format(response))
+                        print('Cookies: {}'.format(session.cookie_jar.filter_cookies()))
                     return video_data
         except Exception as e:
-            raise ValueError(f"获取抖音视频数据出错了: {e}")
+            raise e
 
     # 获取单个抖音直播视频数据/Get single Douyin Live video data
     @retry(stop=stop_after_attempt(4), wait=wait_fixed(7))
