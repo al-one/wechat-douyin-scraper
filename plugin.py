@@ -12,6 +12,8 @@ class App(Plugin):
     def __init__(self, config: dict):
         super().__init__(config)
         self.api = Scraper()
+        if cok := config.get('douyin_cookies'):
+            self.api.douyin_api_headers['Cookie'] = cok
 
     def help(self, **kwargs):
         return '抖音/TikTok/快手视频去水印'

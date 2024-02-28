@@ -42,7 +42,7 @@ class Scraper:
             'accept-encoding': 'gzip, deflate, br',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
             'Referer': 'https://www.douyin.com/',
-            'Cookie': 'ttwid=1%7C_YWevsPUAiiah-UmkGfVcE6JK44XDRYhmtzl3BJzdrg%7C1708507529%7Cc66ca247a2b20a7f6b5abfb014ce38c4258b1f18ba4009424fdb0b42799e285e'
+            'Cookie': ''
         }
         self.tiktok_api_headers = {
             'User-Agent': 'com.ss.android.ugc.trill/494+Mozilla/5.0+(Linux;+Android+12;+2112123G+Build/SKQ1.211006.001;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/107.0.5304.105+Mobile+Safari/537.36'
@@ -454,7 +454,7 @@ class Scraper:
         # print('正在获取TikTok视频数据...')
         try:
             # 构造访问链接/Construct the access link
-            api_url = f'https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/feed/?aweme_id={video_id}'
+            api_url = f'https://cfrp.hacs.vip/api16-normal-c-useast1a.tiktokv.com/aweme/v1/feed/?aweme_id={video_id}'
             print("正在获取视频数据API: {}".format(api_url))
             async with aiohttp.ClientSession() as session:
                 async with session.get(api_url, headers=self.tiktok_api_headers, proxy=self.proxies,
@@ -700,7 +700,7 @@ class Scraper:
 
         print(f"获取到的**{url_platform}**视频ID是{video_id}")
         # 获取视频数据/Get video data
-        data = await self.get_douyin_video_data(video_id) if url_platform == 'douyin' \
+        data = await self.get_tiktok_video_data(video_id) if url_platform == 'douyin' \
             else await self.get_tiktok_video_data(video_id) if url_platform == 'tiktok' \
             else await self.get_bilibili_video_data(video_id) if url_platform == 'bilibili' \
             else await self.get_ixigua_video_data(video_id) if url_platform == 'xigua' \
