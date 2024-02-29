@@ -390,7 +390,7 @@ class Scraper:
                     response = await response.json()
                     # 获取视频数据/Get video data
                     #video_data = response.get('item_list', [None])[0]
-                    video_data = response.get('aweme_detail', [None])
+                    video_data = response.get('aweme_detail')
                     #print(video_data)
                     if not video_data:
                         print("抖音API返回数据: {}".format(response))
