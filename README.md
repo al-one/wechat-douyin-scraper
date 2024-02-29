@@ -19,7 +19,7 @@
   "plugins": [
     {
       "name": "douyin_scraper",
-      "command": ["复制打开抖音", "v.douyin", "tiktok.com", "kuaishou.com"],
+      "command": ["试一下"],
       "with_link": "{desc}\n高清视频链接:\n{link}", # str或bool，为str时作为回复模板
       "only_link": true,     # 仅发送链接，bool或dict
       "without_at": {        # 无需@机器人也会解析，bool或dict
@@ -28,6 +28,7 @@
         "*": false
       },
       "keep_assets_days": 3  # 清理N天前的视频缓存
+      "douyin_cookies": "" # 抖音网页版登陆后，Cookies 中的 sessionid
     }
   ]
 ```

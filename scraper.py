@@ -378,7 +378,8 @@ class Scraper:
         """
         try:
             # 构造访问链接/Construct the access link
-            api_url = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=%s&a_bogus=64745b2b5bdc4e75b720a9a85b19867a" % video_id
+            #api_url = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=%s&a_bogus=64745b2b5bdc4e75b720a9a85b19867a" % video_id
+            api_url = "https://www.douyin.com/aweme/v1/web/aweme/detail/?device_platform=webapp&aid=6383&channel=channel_pc_web&aweme_id=%s&pc_client_type=1&version_code=190500&version_name=19.5.0&cookie_enabled=true&screen_width=1344&screen_height=756&browser_language=zh-CN&browser_platform=Win32&browser_name=Firefox&browser_version=110.0&browser_online=true&engine_name=Gecko&engine_version=109.0&os_name=Windows&os_version=10&cpu_core_num=16&device_memory=&platform=PC&webid=7158288523463362079&msToken=abL8SeUTPa9-EToD8qfC7toScSADxpg6yLh2dbNcpWHzE0bT04txM_4UwquIcRvkRb9IU8sifwgM1Kwf1Lsld81o9Irt2_yNyUbbQPSUO8EfVlZJ_78FckDFnwVBVUVK"  % video_id
             # api_url = self.generate_x_bogus_url(api_url)
             # 访问API/Access API
             print("正在请求抖音视频API: {}".format(api_url))
@@ -388,8 +389,9 @@ class Scraper:
                                        timeout=10) as response:
                     response = await response.json()
                     # 获取视频数据/Get video data
-                    video_data = response.get('item_list', [None])[0]
-                    # print('获取视频数据成功！')
+                    #video_data = response.get('item_list', [None])[0]
+                    video_data = response.get('aweme_detail', [None])
+                    print(video_data)
                     if not video_data:
                         print("抖音API返回数据: {}".format(response))
                         print('Cookies: {}'.format(session.cookie_jar.filter_cookies()))
@@ -700,7 +702,7 @@ class Scraper:
 
         print(f"获取到的**{url_platform}**视频ID是{video_id}")
         # 获取视频数据/Get video data
-        data = await self.get_tiktok_video_data(video_id) if url_platform == 'douyin' \
+        data = await self.get_douyin_video_data(video_id) if url_platform == 'douyin' \
             else await self.get_tiktok_video_data(video_id) if url_platform == 'tiktok' \
             else await self.get_bilibili_video_data(video_id) if url_platform == 'bilibili' \
             else await self.get_ixigua_video_data(video_id) if url_platform == 'xigua' \
