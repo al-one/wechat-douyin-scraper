@@ -42,7 +42,7 @@ class Scraper:
             'accept-encoding': 'gzip, deflate, br',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
             'Referer': 'https://www.douyin.com/',
-            'Cookie': ''
+            'Cookie': 'sessionid=7bf1e771459bb92e6e4410ad1cbfd75'
         }
         self.tiktok_api_headers = {
             'User-Agent': 'com.ss.android.ugc.trill/494+Mozilla/5.0+(Linux;+Android+12;+2112123G+Build/SKQ1.211006.001;+wv)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Version/4.0+Chrome/107.0.5304.105+Mobile+Safari/537.36'
