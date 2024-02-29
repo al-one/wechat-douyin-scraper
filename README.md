@@ -28,7 +28,7 @@
         "*": false
       },
       "keep_assets_days": 3  # 清理N天前的视频缓存
-      "douyin_cookies": "" # 抖音网页版登陆后，Cookies 中的 sessionid
+      "douyin_cookies": "" # 抖音网页版登陆后复制所有 cookie
     }
   ]
 ```

@@ -391,7 +391,7 @@ class Scraper:
                     # 获取视频数据/Get video data
                     #video_data = response.get('item_list', [None])[0]
                     video_data = response.get('aweme_detail', [None])
-                    print(video_data)
+                    #print(video_data)
                     if not video_data:
                         print("抖音API返回数据: {}".format(response))
                         print('Cookies: {}'.format(session.cookie_jar.filter_cookies()))
