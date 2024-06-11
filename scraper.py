@@ -16,6 +16,7 @@
 import re
 import os
 import time
+import json
 import execjs
 import aiohttp
 import platform
@@ -282,7 +283,7 @@ class Scraper:
             """
             快手视频链接类型(不全)：
             1. https://www.kuaishou.com/short-video/3xiqjrezhqjyzxw
-            2. https://v.kuaishou.com/75kDOJ 
+            2. https://v.kuaishou.com/75kDOJ
             快手用户链接类型(不全)：
             1. https://www.kuaishou.com/profile/3xvgbyksme9f2p6
             快手直播链接类型(不全)：
@@ -378,9 +379,7 @@ class Scraper:
         """
         try:
             # 构造访问链接/Construct the access link
-            api_url = "https://beta.tikhub.io/api/v1/douyin/app/v3/fetch_one_video?aweme_id=%s" % video_id
-            #api_url = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=%s&a_bogus=64745b2b5bdc4e75b720a9a85b19867a" % video_id
-            #api_url = "https://www.douyin.com/aweme/v1/web/aweme/detail/?device_platform=webapp&aid=6383&channel=channel_pc_web&aweme_id=%s&pc_client_type=1&version_code=190500&version_name=19.5.0&cookie_enabled=true&screen_width=1344&screen_height=756&browser_language=zh-CN&browser_platform=Win32&browser_name=Firefox&browser_version=110.0&browser_online=true&engine_name=Gecko&engine_version=109.0&os_name=Windows&os_version=10&cpu_core_num=16&device_memory=&platform=PC&webid=7158288523463362079&msToken=abL8SeUTPa9-EToD8qfC7toScSADxpg6yLh2dbNcpWHzE0bT04txM_4UwquIcRvkRb9IU8sifwgM1Kwf1Lsld81o9Irt2_yNyUbbQPSUO8EfVlZJ_78FckDFnwVBVUVK"  % video_id
+            api_url = "https://api.qtkj.love/api/spjx.php?msg=https://www.iesdouyin.com/share/video/%s/" % video_id
             # api_url = self.generate_x_bogus_url(api_url)
             # 访问API/Access API
             print("正在请求抖音视频API: {}".format(api_url))
@@ -388,11 +387,22 @@ class Scraper:
                 self.douyin_api_headers['Referer'] = f'https://www.douyin.com/video/{video_id}'
                 async with session.get(api_url, headers=self.douyin_api_headers, proxy=self.proxies,
                                        timeout=10) as response:
-                    response = await response.json()
+                    response = json.loads(await response.text()) or {}
                     # 获取视频数据/Get video data
                     #video_data = response.get('item_list', [None])[0]
                     video_data = response.get('data', {}).get('aweme_detail', {})
-                    #print(video_data)
+                    if 'qtkj.love' in api_url:
+                        video_data = response.get('data', {})
+                        video_data.update({
+                            'desc': video_data.get('title'),
+                            'video': {
+                                'play_addr': {
+                                    'uri': '',
+                                    'url_list': [video_data.get('videourl')]
+                                },
+                            },
+                        })
+                    print(video_data)
                     if not video_data:
                         print("抖音API返回数据: {}".format(response))
                         print('Cookies: {}'.format(session.cookie_jar.filter_cookies()))
@@ -749,13 +759,13 @@ class Scraper:
 
             """
             以下为(视频||图片)数据处理的四个方法,如果你需要自定义数据处理请在这里修改.
-            The following are four methods of (video || image) data processing. 
+            The following are four methods of (video || image) data processing.
             If you need to customize data processing, please modify it here.
             """
 
             """
             创建已知数据字典(索引相同)，稍后使用.update()方法更新数据
-            Create a known data dictionary (index the same), 
+            Create a known data dictionary (index the same),
             and then use the .update() method to update the data
             """
 
@@ -799,9 +809,9 @@ class Scraper:
                         # 将信息储存在字典中/Store information in a dictionary
                         uri = data['video']['play_addr']['uri']
                         wm_video_url = data['video']['play_addr']['url_list'][0]
-                        wm_video_url_HQ = f"https://aweme.snssdk.com/aweme/v1/playwm/?video_id={uri}&radio=1080p&line=0"
+                        wm_video_url_HQ = f"https://aweme.snssdk.com/aweme/v1/playwm/?video_id={uri}&radio=1080p&line=0" if uri else ''
                         nwm_video_url = wm_video_url.replace('playwm', 'play')
-                        nwm_video_url_HQ = f"https://aweme.snssdk.com/aweme/v1/play/?video_id={uri}&ratio=1080p&line=0"
+                        nwm_video_url_HQ = f"https://aweme.snssdk.com/aweme/v1/play/?video_id={uri}&ratio=1080p&line=0" if uri else ''
                         api_data = {
                             'video_data':
                                 {
