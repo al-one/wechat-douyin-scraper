@@ -1,6 +1,7 @@
 import os
 import time
 import asyncio
+import requests
 from plugins import register, Plugin, Event, logger, Reply, ReplyType
 from .scraper import Scraper
 
@@ -68,10 +69,15 @@ class App(Plugin):
                 return Reply(ReplyType.TEXT, f'Scraper: {msg}')
             return Reply(ReplyType.TEXT, f'{result}' or '获取视频失败')
 
+        resp = requests.head(url)
+        size = round(int(resp.headers.get('Content-Length', 0)) / 1024 / 1024)
+        link = vdata.get('nwm_video_url_HQ') or url
+        reply = None
+        limit_size = self.config_for(event, 'limit_size', 50)
+        size_tip = f'\n视频尺寸({size}M)过大，无法发送视频' if size >= limit_size else ''
         with_link = self.config_for(event, 'with_link')
         only_link = self.config_for(event, 'only_link')
         if with_link or only_link:
-            link = vdata.get('nwm_video_url_HQ') or url
             if with_link not in [True, 1, '1', 'on', 'yes', 'true']:
                 if '{link}' not in with_link:
                     with_link = f'{with_link}' + '{link}'
@@ -80,6 +86,10 @@ class App(Plugin):
             reply = Reply(ReplyType.TEXT, link.strip())
             if only_link:
                 return reply
+            reply.content = f'{reply.content}{size_tip}'
+        if size_tip:
+            return reply or Reply(ReplyType.TEXT, f'{link}{size_tip}')
+        elif reply:
             event.channel.send(reply, event.message)
         return Reply(ReplyType.VIDEO, url)
 
