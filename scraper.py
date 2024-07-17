@@ -379,7 +379,7 @@ class Scraper:
         """
         try:
             # 构造访问链接/Construct the access link
-            api_url = "https://api.qtkj.love/api/spjx.php?msg=https://www.iesdouyin.com/share/video/%s/" % video_id
+            api_url = "https://api.qtkj.love/api/spjx.php?msg=https://www.iesdouyin.com/share/video/%s" % video_id
             # api_url = self.generate_x_bogus_url(api_url)
             # 访问API/Access API
             print("正在请求抖音视频API: {}".format(api_url))
@@ -398,7 +398,7 @@ class Scraper:
                             'video': {
                                 'play_addr': {
                                     'uri': '',
-                                    'url_list': [video_data.get('videourl')]
+                                    'url_list': [video_data.get('videourl') or '']
                                 },
                             },
                         })
